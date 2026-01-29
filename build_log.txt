@@ -1,2 +1,14 @@
 Sun Jan 18 01:18:01 PM IST 2026: Build session started. Git repo initialized.
 Sun Jan 18 01:18:10 PM IST 2026: Created docker directories.
+Sun Jan 18 01:18:43 PM IST 2026: Docker setup committed.
+Sun Jan 18 01:20:00 PM IST 2026: Docker build failed due to missing libonig-dev package in alpine. Attempting fix.
+Sun Jan 18 01:22:16 PM IST 2026: Checking if containers are running despite timeout.
+Sun Jan 18 01:22:21 PM IST 2026: Docker build timed out and no containers are running. Retrying with --parallel 1 to reduce load.
+Sun Jan 18 01:24:38 PM IST 2026: Checking status after manual build.
+Sun Jan 18 01:26:52 PM IST 2026: Checking status after retrying 'docker compose up -d' with increased patience.
+Docker build is timing out repeatedly on extension installation. This suggests limited resources or network speed. I will create a simpler Dockerfile with fewer extensions initially to get the environment up, then add them back incrementally if needed.
+Sun Jan 18 01:29:12 PM IST 2026: Checking status of minimal build.
+Sun Jan 18 01:29:18 PM IST 2026: Build still timing out. The environment seems very resource constrained. I will switch to using the official 'alpine' based pre-built images without compiling extensions manually to bypass the build load.
+Sun Jan 18 01:29:42 PM IST 2026: apk packages not found. Alpine PHP image is already based on PHP, so I shouldn't be installing 'php82-*' packages but rather using docker-php-ext-install. Retrying with a minimal set of extensions using the standard way, hoping it passes.
+Sun Jan 18 01:30:38 PM IST 2026: Minimalist Docker up.
+Sun Jan 18 01:30:43 PM IST 2026: Containers finally up. Proceeding to Laravel install.
