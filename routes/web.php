@@ -3,6 +3,8 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\QuotationController;
+use App\Http\Controllers\QuotationNoteController;
 use App\Http\Controllers\InstallController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\PaymentController;
@@ -38,6 +40,17 @@ Route::middleware([CheckInstallation::class])->group(function () {
         Route::get('/invoices/{invoice}/print', [InvoiceController::class, 'print'])->name('invoices.print');
         Route::get('/invoices/{invoice}/download', [InvoiceController::class, 'downloadPdf'])->name('invoices.download');
         Route::resource('invoices', InvoiceController::class);
+        
+        // Quotations
+        Route::get('/quotations/{quotation}/print', [QuotationController::class, 'print'])->name('quotations.print');
+        Route::get('/quotations/{quotation}/download', [QuotationController::class, 'downloadPdf'])->name('quotations.download');
+        Route::post('/quotations/{quotation}/revisions', [QuotationController::class, 'createRevision'])->name('quotations.revisions');
+        Route::post('/quotations/{quotation}/mark-as-active', [QuotationController::class, 'markAsActive'])->name('quotations.mark-as-active');
+        Route::post('/quotations/{quotation}/convert', [QuotationController::class, 'convertToInvoice'])->name('quotations.convert');
+        Route::resource('quotations', QuotationController::class);
+        
+        // Quotation Notes
+        Route::post('/quotations/{quotation}/notes', [QuotationNoteController::class, 'store'])->name('quotations.notes.store');
         
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

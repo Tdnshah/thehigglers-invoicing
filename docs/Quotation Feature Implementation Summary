@@ -1,0 +1,29 @@
+# Quotation Feature Implementation Summary
+
+The Quotation feature has been successfully fully implemented from end-to-end, mimicking the rich UI of invoices while incorporating the requested tracking and lifecycle logic.
+
+## What Was Done
+
+1. **Database Schema Setup**
+   - Created three new tables: `quotations`, `quotation_items`, and `quotation_notes`.
+   - Setup `parent_id` for tracking quotation revisions natively in exactly the same table.
+2. **Backend Architecture**
+   - Created `Quotation`, `QuotationItem`, and `QuotationNote` models.
+   - Connected `quotations()` relation backward to `Client` and `User`.
+   - Fully implemented `QuotationController` enforcing the exact same robust GST tax logic handling layout as your invoicing system.
+3. **Internal Life Cycle Flow**
+   - Quotations start as `draft` and can be moved to `sent`, `approved`, or `rejected`.
+   - Once marked as `approved`, an Admin can click `Convert to Invoice`. This dynamically copies the items, maps the tax calculations flawlessly onto the `invoices` table, and sets `invoice_id` on the original quotation so it renders as `Converted to Invoice #INV-...` and prevents further edits or duplicate conversions.
+   - If a quote needs a change, Admins can hit `Create Revision`. This replicates the quotation, increments the `revision_number`, suffixes `-V2` etc. to the quote number, and puts it in `draft` mode.
+4. **Internal Notes**
+   - Built a sleek chronological tracking timeline at the bottom of the quotation view only visible to your company admins. You can leave notes here as the client evaluates the quotation.
+5. **Views & Menu**
+   - Adapted the `index`, `create`, `edit`, `show`, and `print` layouts using your exact design language.
+   - Replaced "Due Date" with "Valid Until" perfectly suited for standard quotations.
+   - Added the new section cleanly to the sidebar and top navigation menu under `invoices`.
+
+## Note on Task File
+Per your request, I also created `QUOTATION_TASKS.md` directly in the project root so you can always refer back to what was accomplished!
+
+## Next Steps
+You can run `docker compose exec app php artisan migrate` (or however you execute your migrations) to inject the new tables, and you will see the new Quotations link appear in your dashboard instantly!

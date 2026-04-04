@@ -70,6 +70,11 @@ class User extends Authenticatable
         return $this->hasMany(Invoice::class);
     }
 
+    public function quotations()
+    {
+        return $this->hasMany(Quotation::class);
+    }
+
     // Helper to check role
     public function isCompanyAdmin()
     {
