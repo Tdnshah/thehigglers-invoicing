@@ -163,6 +163,13 @@
                     
                     <div class="detail-label">Currency:</div>
                     <div>{{ $quotation->currency }}</div>
+
+                    @foreach($quotation->custom_fields ?? [] as $cf)
+                    @if(!empty($cf['key']) && !empty($cf['value']))
+                    <div class="detail-label">{{ $cf['key'] }}:</div>
+                    <div>{{ $cf['value'] }}</div>
+                    @endif
+                    @endforeach
                 </div>
             </div>
         </div>

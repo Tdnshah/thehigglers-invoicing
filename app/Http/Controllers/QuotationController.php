@@ -47,16 +47,19 @@ class QuotationController extends Controller
         }
 
         $clients = $user->clients;
-        
+        $companyCustomFields = $this->getCompanyCustomFields($user, 'show_in_quotation');
+        $existingCF = collect();
+
         $sourceQuotation = null;
         if ($request->has('source_id')) {
             $sourceQuotation = Quotation::with('items')->where('user_id', $user->id)->findOrFail($request->source_id);
             if ($sourceQuotation->isLocked()) {
                 return redirect()->route('quotations.show', $sourceQuotation)->with('error', 'This quotation series is locked because a version has already been approved.');
             }
+            $existingCF = collect($sourceQuotation->custom_fields ?? [])->keyBy('key');
         }
 
-        return view('quotations.create', compact('clients', 'sourceQuotation'));
+        return view('quotations.create', compact('clients', 'sourceQuotation', 'companyCustomFields', 'existingCF'));
     }
 
     public function store(Request $request)
@@ -86,6 +89,9 @@ class QuotationController extends Controller
             'items.*.tax_rate' => 'nullable|numeric|in:0,5,12,18,28',
             'items.*.quantity' => 'required|numeric|min:0.01',
             'items.*.unit_price' => 'required|numeric|min:0',
+            'custom_fields' => 'nullable|array',
+            'custom_fields.*.key' => 'required|string|max:100',
+            'custom_fields.*.value' => 'nullable|string|max:255',
             'client_notes' => 'nullable|string',
             'terms_conditions' => 'nullable|string',
             'parent_id' => 'nullable|exists:quotations,id',
@@ -149,6 +155,7 @@ class QuotationController extends Controller
             'client_notes' => $validated['client_notes'] ?? null,
             'terms_conditions' => $validated['terms_conditions'] ?? null,
             'is_active' => empty($validated['parent_id']), // Only V0 is active by default
+            'custom_fields' => $this->normalizeDocumentCustomFields($validated['custom_fields'] ?? []),
         ]);
 
         foreach ($validated['items'] as $item) {
@@ -223,6 +230,8 @@ class QuotationController extends Controller
 
         $clients = $user->clients;
         $quotation->load('items');
+        $companyCustomFields = $this->getCompanyCustomFields($user, 'show_in_quotation');
+        $existingCF = collect($quotation->custom_fields ?? [])->keyBy('key');
 
         $quotationItems = $quotation->items->map(function($item) {
             return [
@@ -234,7 +243,7 @@ class QuotationController extends Controller
             ];
         });
 
-        return view('quotations.edit', compact('quotation', 'clients', 'quotationItems'));
+        return view('quotations.edit', compact('quotation', 'clients', 'quotationItems', 'companyCustomFields', 'existingCF'));
     }
 
     public function update(Request $request, Quotation $quotation)
@@ -261,6 +270,9 @@ class QuotationController extends Controller
             'items.*.tax_rate' => 'required|numeric|in:0,5,12,18,28',
             'items.*.quantity' => 'required|numeric|min:0.01',
             'items.*.unit_price' => 'required|numeric|min:0',
+            'custom_fields' => 'nullable|array',
+            'custom_fields.*.key' => 'required|string|max:100',
+            'custom_fields.*.value' => 'nullable|string|max:255',
             'status' => 'required|in:draft,sent,approved,rejected',
             'client_notes' => 'nullable|string',
             'terms_conditions' => 'nullable|string',
@@ -308,6 +320,7 @@ class QuotationController extends Controller
             'status' => $validated['status'],
             'client_notes' => $validated['client_notes'] ?? null,
             'terms_conditions' => $validated['terms_conditions'] ?? null,
+            'custom_fields' => $this->normalizeDocumentCustomFields($validated['custom_fields'] ?? []),
         ]);
 
         $quotation->items()->delete();
@@ -400,6 +413,7 @@ class QuotationController extends Controller
 
         $quotation->load(['client', 'items', 'user.company']);
         $pdf = Pdf::loadView('quotations.print', compact('quotation'));
-        return $pdf->download('Quotation-' . $quotation->quotation_number . '.pdf');
+        $safeNumber = str_replace(['/', '\\'], '-', $quotation->quotation_number);
+        return $pdf->download('Quotation-' . $safeNumber . '.pdf');
     }
 }
