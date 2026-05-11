@@ -87,10 +87,9 @@ class Quotation extends Model
     public function isLocked()
     {
         $rootId = $this->parent_id ?? $this->id;
-        return Quotation::where('id', $rootId)
-            ->orWhere('parent_id', $rootId)
-            ->where('status', 'approved')
-            ->exists();
+        return Quotation::where(function ($query) use ($rootId) {
+            $query->where('id', $rootId)->orWhere('parent_id', $rootId);
+        })->where('status', 'approved')->exists();
     }
 
     /**
@@ -99,9 +98,8 @@ class Quotation extends Model
     public function getApprovedRevision()
     {
         $rootId = $this->parent_id ?? $this->id;
-        return Quotation::where('id', $rootId)
-            ->orWhere('parent_id', $rootId)
-            ->where('status', 'approved')
-            ->first();
+        return Quotation::where(function ($query) use ($rootId) {
+            $query->where('id', $rootId)->orWhere('parent_id', $rootId);
+        })->where('status', 'approved')->first();
     }
 }
