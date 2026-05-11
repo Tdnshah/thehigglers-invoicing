@@ -1,3 +1,34 @@
+@push('scripts')
+@if(isset($companyCustomFields) && $companyCustomFields->isNotEmpty())
+<script>window.__cfAvailable = {!! json_encode($companyCustomFields->values()->toArray()) !!};</script>
+@endif
+<script>
+function customFieldsPicker(available, existing) {
+    return {
+        available,
+        selected: Array.isArray(existing) && existing.length > 0
+            ? existing.map(f => ({ key: f.key, value: f.value ?? '' }))
+            : [],
+        get canAddMore() {
+            const used = this.selected.map(f => f.key).filter(Boolean);
+            return this.available.some(opt => !used.includes(opt.key));
+        },
+        optionsFor(index) {
+            const used = this.selected.map((f, i) => i !== index ? f.key : null).filter(k => k);
+            return this.available.filter(opt => !used.includes(opt.key));
+        },
+        onKeyChange(index) {
+            const key = this.selected[index].key;
+            const def = this.available.find(opt => opt.key === key);
+            if (def) this.selected[index].value = def.value || '';
+        },
+        addField() { this.selected.push({ key: '', value: '' }); },
+        removeField(index) { this.selected.splice(index, 1); },
+    };
+}
+</script>
+@endpush
+
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -197,6 +228,59 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Custom Fields -->
+                        @if(isset($companyCustomFields) && $companyCustomFields->isNotEmpty())
+                        @php
+                            $__cfExisting = collect(old('custom_fields', isset($sourceQuotation) ? ($sourceQuotation->custom_fields ?? []) : []))
+                                ->filter(fn($f) => !empty($f['key']))
+                                ->map(fn($f) => ['key' => $f['key'], 'value' => $f['value'] ?? ''])
+                                ->values()->toArray();
+                        @endphp
+                        <script>window.__cfExisting = {!! json_encode($__cfExisting) !!};</script>
+                        <div class="mb-6"
+                             x-data="customFieldsPicker(window.__cfAvailable, window.__cfExisting)">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="text-lg font-medium text-gray-900">Custom Fields</h3>
+                                <button type="button" @click="addField()" x-show="canAddMore"
+                                        class="text-sm text-indigo-600 hover:text-indigo-900 font-medium">
+                                    + Add Field
+                                </button>
+                            </div>
+                            <p x-show="selected.length === 0" class="text-sm text-gray-400 italic mb-2">
+                                Click "+ Add Field" to attach a custom field to this quotation.
+                            </p>
+                            <template x-for="(field, index) in selected" :key="index">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <div class="w-2/5">
+                                        <select :name="'custom_fields[' + index + '][key]'"
+                                                x-model="field.key"
+                                                @change="onKeyChange(index)"
+                                                class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm">
+                                            <option value="">— Select Field —</option>
+                                            <template x-for="opt in optionsFor(index)" :key="opt.key">
+                                                <option :value="opt.key" x-text="opt.key"></option>
+                                            </template>
+                                        </select>
+                                    </div>
+                                    <div class="flex-1">
+                                        <input type="text"
+                                               :name="'custom_fields[' + index + '][value]'"
+                                               x-model="field.value"
+                                               readonly
+                                               class="block w-full border-gray-300 bg-gray-50 rounded-md shadow-sm text-sm cursor-default"
+                                               placeholder="Auto-filled from company settings">
+                                    </div>
+                                    <button type="button" @click="removeField(index)"
+                                            class="text-red-500 hover:text-red-700 flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+                        @endif
 
                         <!-- Notes -->
                         <div class="mb-6">

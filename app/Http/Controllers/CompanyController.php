@@ -51,15 +51,20 @@ class CompanyController extends Controller
             'bank_ifsc' => 'nullable|string|max:20',
             'custom_fields' => 'nullable|array',
             'custom_fields.*.key' => 'required|string|max:255',
-            'custom_fields.*.value' => 'required|string|max:255',
+            'custom_fields.*.value' => 'nullable|string|max:255',
+            'custom_fields.*.show_in_invoice' => 'nullable|boolean',
+            'custom_fields.*.show_in_quotation' => 'nullable|boolean',
         ]);
 
         $customFields = [];
-        if (isset($validated['custom_fields'])) {
-            foreach ($validated['custom_fields'] as $field) {
-                if (!empty($field['key'])) {
-                    $customFields[$field['key']] = $field['value'];
-                }
+        foreach ($request->input('custom_fields', []) as $field) {
+            if (!empty($field['key'])) {
+                $customFields[] = [
+                    'key' => $field['key'],
+                    'value' => $field['value'] ?? '',
+                    'show_in_invoice' => !empty($field['show_in_invoice']),
+                    'show_in_quotation' => !empty($field['show_in_quotation']),
+                ];
             }
         }
 

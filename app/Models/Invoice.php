@@ -26,11 +26,13 @@ class Invoice extends Model
         'invoice_type',
         'place_of_supply',
         'lut_number',
+        'custom_fields',
     ];
 
     protected $casts = [
         'invoice_date' => 'date',
         'due_date' => 'date',
+        'custom_fields' => 'array',
     ];
 
     public function user()

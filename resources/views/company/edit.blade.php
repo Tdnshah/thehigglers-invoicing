@@ -101,16 +101,28 @@
                                         + Add Field
                                     </button>
                                 </div>
-                                <div class="space-y-4">
+                                <div class="space-y-3">
                                     <template x-for="(field, index) in customFields" :key="index">
-                                        <div class="flex items-center gap-4">
-                                            <div class="w-1/3">
-                                                <input type="text" :name="'custom_fields[' + index + '][key]'" x-model="field.key" class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm" placeholder="Label (e.g. LUT Number)">
+                                        <div class="flex flex-wrap items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                            <div class="flex-1 min-w-[160px]">
+                                                <label class="block text-xs text-gray-500 mb-1">Label</label>
+                                                <input type="text" :name="'custom_fields[' + index + '][key]'" x-model="field.key" class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm" placeholder="e.g. LUT Number 2024-25">
                                             </div>
-                                            <div class="w-1/2">
-                                                <input type="text" :name="'custom_fields[' + index + '][value]'" x-model="field.value" class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm" placeholder="Value">
+                                            <div class="flex-1 min-w-[160px]">
+                                                <label class="block text-xs text-gray-500 mb-1">Default Value</label>
+                                                <input type="text" :name="'custom_fields[' + index + '][value]'" x-model="field.value" class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm" placeholder="Default value (optional)">
                                             </div>
-                                            <div class="w-auto">
+                                            <div class="flex flex-col items-center gap-1">
+                                                <label class="text-xs text-gray-500">Show in Invoice</label>
+                                                <input type="hidden" :name="'custom_fields[' + index + '][show_in_invoice]'" value="0">
+                                                <input type="checkbox" :name="'custom_fields[' + index + '][show_in_invoice]'" x-model="field.show_in_invoice" value="1" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
+                                            </div>
+                                            <div class="flex flex-col items-center gap-1">
+                                                <label class="text-xs text-gray-500">Show in Quotation</label>
+                                                <input type="hidden" :name="'custom_fields[' + index + '][show_in_quotation]'" value="0">
+                                                <input type="checkbox" :name="'custom_fields[' + index + '][show_in_quotation]'" x-model="field.show_in_quotation" value="1" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
+                                            </div>
+                                            <div class="flex items-end pb-1">
                                                 <button type="button" @click="removeCustomField(index)" class="text-red-600 hover:text-red-900">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                         <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
@@ -138,14 +150,32 @@
         </div>
     </div>
 
+    @php
+        $customFieldsJs = collect($company->custom_fields ?? [])->map(function($field, $key) {
+            // New format: array of objects with 'key' property
+            if (is_array($field) && array_key_exists('key', $field)) {
+                return [
+                    'key' => $field['key'] ?? '',
+                    'value' => $field['value'] ?? '',
+                    'show_in_invoice' => isset($field['show_in_invoice']) ? (bool) $field['show_in_invoice'] : true,
+                    'show_in_quotation' => isset($field['show_in_quotation']) ? (bool) $field['show_in_quotation'] : true,
+                ];
+            }
+            // Legacy format: ['Label' => 'Value']
+            return [
+                'key' => is_string($key) ? $key : '',
+                'value' => is_string($field) ? $field : '',
+                'show_in_invoice' => true,
+                'show_in_quotation' => true,
+            ];
+        })->values()->toArray();
+    @endphp
     <script>
         function companyForm() {
             return {
-                customFields: @json(collect($company->custom_fields ?? [])->map(function($value, $key) {
-                    return ['key' => $key, 'value' => $value];
-                })->values()->toArray()),
+                customFields: @json($customFieldsJs),
                 addCustomField() {
-                    this.customFields.push({ key: '', value: '' });
+                    this.customFields.push({ key: '', value: '', show_in_invoice: true, show_in_quotation: true });
                 },
                 removeCustomField(index) {
                     this.customFields.splice(index, 1);

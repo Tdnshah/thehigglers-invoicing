@@ -56,7 +56,8 @@ class InvoiceController extends Controller
         }
 
         $clients = $user->clients;
-        return view('invoices.create', compact('clients'));
+        $companyCustomFields = $this->getCompanyCustomFields($user, 'show_in_invoice');
+        return view('invoices.create', compact('clients', 'companyCustomFields'));
     }
 
     /**
@@ -91,6 +92,9 @@ class InvoiceController extends Controller
             'items.*.tax_rate' => 'nullable|numeric|in:0,5,12,18,28', // Made nullable for tests/defaults
             'items.*.quantity' => 'required|numeric|min:0.01',
             'items.*.unit_price' => 'required|numeric|min:0',
+            'custom_fields' => 'nullable|array',
+            'custom_fields.*.key' => 'required|string|max:100',
+            'custom_fields.*.value' => 'nullable|string|max:255',
             'notes' => 'nullable|string',
         ]);
 
@@ -175,7 +179,11 @@ class InvoiceController extends Controller
                 'amount' => $item['quantity'] * $item['unit_price'],
             ]);
         }
-        
+
+        $invoice->update([
+            'custom_fields' => $this->normalizeDocumentCustomFields($validated['custom_fields'] ?? []),
+        ]);
+
         // Send email to client if they have an email address
         if ($client->email) {
             Mail::to($client->email)->send(new InvoiceCreated($invoice));
@@ -260,7 +268,8 @@ class InvoiceController extends Controller
         $invoice->load(['client', 'items', 'user.company']);
         
         $pdf = Pdf::loadView('invoices.print', compact('invoice'));
-        return $pdf->download('Invoice-' . $invoice->invoice_number . '.pdf');
+        $safeNumber = str_replace(['/', '\\'], '-', $invoice->invoice_number);
+        return $pdf->download('Invoice-' . $safeNumber . '.pdf');
     }
 
     /**
@@ -281,6 +290,8 @@ class InvoiceController extends Controller
 
         $clients = $user->clients;
         $invoice->load('items');
+        $companyCustomFields = $this->getCompanyCustomFields($user, 'show_in_invoice');
+        $existingCF = collect($invoice->custom_fields ?? [])->keyBy('key');
 
         $invoiceItems = $invoice->items->map(function($item) {
             return [
@@ -292,7 +303,7 @@ class InvoiceController extends Controller
             ];
         });
 
-        return view('invoices.edit', compact('invoice', 'clients', 'invoiceItems'));
+        return view('invoices.edit', compact('invoice', 'clients', 'invoiceItems', 'companyCustomFields', 'existingCF'));
     }
 
     /**
@@ -326,6 +337,9 @@ class InvoiceController extends Controller
             'items.*.tax_rate' => 'required|numeric|in:0,5,12,18,28',
             'items.*.quantity' => 'required|numeric|min:0.01',
             'items.*.unit_price' => 'required|numeric|min:0',
+            'custom_fields' => 'nullable|array',
+            'custom_fields.*.key' => 'required|string|max:100',
+            'custom_fields.*.value' => 'nullable|string|max:255',
             'status' => 'required|in:draft,sent,paid,overdue',
             'notes' => 'nullable|string',
         ]);
@@ -382,6 +396,7 @@ class InvoiceController extends Controller
             'total' => $total,
             'status' => $validated['status'],
             'notes' => $validated['notes'] ?? null,
+            'custom_fields' => $this->normalizeDocumentCustomFields($validated['custom_fields'] ?? []),
         ]);
 
         // Sync items: Delete old and create new (simpler than updating individually)

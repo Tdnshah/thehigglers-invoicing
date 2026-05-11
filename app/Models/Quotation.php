@@ -29,11 +29,13 @@ class Quotation extends Model
         'client_notes',
         'terms_conditions',
         'invoice_id',
+        'custom_fields',
     ];
 
     protected $casts = [
         'quotation_date' => 'date',
         'valid_until' => 'date',
+        'custom_fields' => 'array',
     ];
 
     public function user()
@@ -87,10 +89,9 @@ class Quotation extends Model
     public function isLocked()
     {
         $rootId = $this->parent_id ?? $this->id;
-        return Quotation::where('id', $rootId)
-            ->orWhere('parent_id', $rootId)
-            ->where('status', 'approved')
-            ->exists();
+        return Quotation::where(function ($q) use ($rootId) {
+            $q->where('id', $rootId)->orWhere('parent_id', $rootId);
+        })->where('status', 'approved')->exists();
     }
 
     /**
@@ -99,9 +100,8 @@ class Quotation extends Model
     public function getApprovedRevision()
     {
         $rootId = $this->parent_id ?? $this->id;
-        return Quotation::where('id', $rootId)
-            ->orWhere('parent_id', $rootId)
-            ->where('status', 'approved')
-            ->first();
+        return Quotation::where(function ($q) use ($rootId) {
+            $q->where('id', $rootId)->orWhere('parent_id', $rootId);
+        })->where('status', 'approved')->first();
     }
 }
