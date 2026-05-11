@@ -80,6 +80,12 @@
         /* GST Compliance additions */
         .gst-label { font-size: 11px; color: #666; }
         .badge { display: inline-block; padding: 2px 6px; border: 1px solid #333; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; }
+        td ol, td ul { margin: 0; padding-left: 1.4em; }
+        td ul { list-style-type: disc; }
+        td ol { list-style-type: decimal; }
+        td ol li, td ul li { margin-bottom: 2px; }
+        td strong { font-weight: bold; }
+        td em { font-style: italic; }
     </style>
 </head>
 <body>
@@ -185,7 +191,7 @@
                 @foreach($quotation->items as $index => $item)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td>{{ $item->description }}</td>
+                    <td>{!! $item->description !!}</td>
                     <td class="text-right">{{ $item->hsn_code ?? '-' }}</td>
                     <td class="text-right">{{ $item->tax_rate }}%</td>
                     <td class="text-center">{{ $item->quantity }}</td>

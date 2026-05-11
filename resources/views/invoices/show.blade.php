@@ -132,7 +132,9 @@
                             <tbody class="divide-y divide-gray-200">
                                 @foreach($invoice->items as $item)
                                     <tr>
-                                        <td class="px-4 py-3 text-sm text-gray-900">{{ $item->description }}</td>
+                                        <td class="px-4 py-3 text-sm text-gray-900">
+                                            <div class="rich-text-content">{!! $item->description !!}</div>
+                                        </td>
                                         <td class="px-4 py-3 text-sm text-gray-900 text-right">{{ $item->hsn_code ?? '-' }}</td>
                                         <td class="px-4 py-3 text-sm text-gray-900 text-right">{{ $item->tax_rate }}%</td>
                                         <td class="px-4 py-3 text-sm text-gray-900 text-right">{{ $item->quantity }}</td>
