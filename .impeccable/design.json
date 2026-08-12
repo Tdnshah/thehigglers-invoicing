@@ -1,0 +1,475 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-11T19:45:56Z",
+  "title": "Design System: The Higglers Invoicing",
+  "extensions": {
+    "colorMeta": {
+      "ink-indigo": {
+        "role": "primary",
+        "displayName": "Ink Indigo",
+        "canonical": "#4f46e5",
+        "tonalRamp": [
+          "#1e1b4b",
+          "#312e81",
+          "#3730a3",
+          "#4338ca",
+          "#4f46e5",
+          "#6366f1",
+          "#a5b4fc",
+          "#eef2ff"
+        ]
+      },
+      "ink-indigo-deep": {
+        "role": "primary",
+        "displayName": "Ink Indigo Deep",
+        "canonical": "#4338ca"
+      },
+      "ink-indigo-glow": {
+        "role": "primary",
+        "displayName": "Ink Indigo Glow",
+        "canonical": "#6366f1"
+      },
+      "ink-indigo-edge": {
+        "role": "primary",
+        "displayName": "Ink Indigo Edge",
+        "canonical": "#818cf8"
+      },
+      "ink-indigo-wash": {
+        "role": "primary",
+        "displayName": "Ink Indigo Wash",
+        "canonical": "#eef2ff"
+      },
+      "graphite": {
+        "role": "secondary",
+        "displayName": "Graphite",
+        "canonical": "#1f2937",
+        "tonalRamp": [
+          "#030712",
+          "#111827",
+          "#1f2937",
+          "#374151",
+          "#4b5563",
+          "#6b7280",
+          "#9ca3af",
+          "#f9fafb"
+        ]
+      },
+      "graphite-deep": {
+        "role": "secondary",
+        "displayName": "Graphite Deep",
+        "canonical": "#111827"
+      },
+      "pencil-gray": {
+        "role": "neutral",
+        "displayName": "Pencil Gray",
+        "canonical": "#6b7280",
+        "tonalRamp": [
+          "#111827",
+          "#374151",
+          "#4b5563",
+          "#6b7280",
+          "#9ca3af",
+          "#d1d5db",
+          "#e5e7eb",
+          "#f9fafb"
+        ]
+      },
+      "rule-gray": {
+        "role": "neutral",
+        "displayName": "Rule Gray",
+        "canonical": "#d1d5db"
+      },
+      "hairline-gray": {
+        "role": "neutral",
+        "displayName": "Hairline Gray",
+        "canonical": "#e5e7eb"
+      },
+      "ledger-paper": {
+        "role": "neutral",
+        "displayName": "Ledger Paper",
+        "canonical": "#f3f4f6"
+      },
+      "paper-tint": {
+        "role": "neutral",
+        "displayName": "Paper Tint",
+        "canonical": "#f9fafb"
+      },
+      "sheet-white": {
+        "role": "neutral",
+        "displayName": "Sheet White",
+        "canonical": "#ffffff"
+      },
+      "settled-green": {
+        "role": "tertiary",
+        "displayName": "Settled Green",
+        "canonical": "#16a34a",
+        "tonalRamp": [
+          "#052e16",
+          "#14532d",
+          "#166534",
+          "#15803d",
+          "#16a34a",
+          "#4ade80",
+          "#bbf7d0",
+          "#dcfce7"
+        ]
+      },
+      "settled-green-ink": {
+        "role": "tertiary",
+        "displayName": "Settled Green Ink",
+        "canonical": "#166534"
+      },
+      "settled-green-wash": {
+        "role": "tertiary",
+        "displayName": "Settled Green Wash",
+        "canonical": "#dcfce7"
+      },
+      "overdue-red": {
+        "role": "tertiary",
+        "displayName": "Overdue Red",
+        "canonical": "#dc2626",
+        "tonalRamp": [
+          "#450a0a",
+          "#7f1d1d",
+          "#991b1b",
+          "#b91c1c",
+          "#dc2626",
+          "#f87171",
+          "#fecaca",
+          "#fee2e2"
+        ]
+      },
+      "overdue-red-ink": {
+        "role": "tertiary",
+        "displayName": "Overdue Red Ink",
+        "canonical": "#991b1b"
+      },
+      "overdue-red-wash": {
+        "role": "tertiary",
+        "displayName": "Overdue Red Wash",
+        "canonical": "#fee2e2"
+      },
+      "in-flight-blue": {
+        "role": "tertiary",
+        "displayName": "In-flight Blue",
+        "canonical": "#1e40af",
+        "tonalRamp": [
+          "#172554",
+          "#1e3a8a",
+          "#1e40af",
+          "#1d4ed8",
+          "#2563eb",
+          "#60a5fa",
+          "#bfdbfe",
+          "#dbeafe"
+        ]
+      },
+      "in-flight-blue-wash": {
+        "role": "tertiary",
+        "displayName": "In-flight Blue Wash",
+        "canonical": "#dbeafe"
+      },
+      "internal-amber": {
+        "role": "tertiary",
+        "displayName": "Internal Amber",
+        "canonical": "#92400e",
+        "tonalRamp": [
+          "#451a03",
+          "#78350f",
+          "#92400e",
+          "#b45309",
+          "#d97706",
+          "#fbbf24",
+          "#fde68a",
+          "#fef3c7"
+        ]
+      },
+      "internal-amber-wash": {
+        "role": "tertiary",
+        "displayName": "Internal Amber Wash",
+        "canonical": "#fef3c7"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Aggregate money figures on the dashboard only."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "The single page heading in the layout header slot."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Panel headers inside the content column."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Table cells, field values, note text, prose."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Uppercase micro-labels above values and table column headers."
+      },
+      "action": {
+        "displayName": "Action",
+        "purpose": "Button and control labels. The only 0.1em tracking in the system."
+      },
+      "document-title": {
+        "displayName": "Document Title",
+        "purpose": "The printed document's title line. Points, not rem, because it is set against A4."
+      },
+      "document-body": {
+        "displayName": "Document Body",
+        "purpose": "Printed document body copy, rendered by Dompdf in DejaVu Sans."
+      }
+    },
+    "shadows": [
+      {
+        "name": "page-header",
+        "value": "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+        "purpose": "The one persistent chrome shadow, under the page heading strip."
+      },
+      {
+        "name": "panel-rest",
+        "value": "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+        "purpose": "Barely-there lift on content panels; the border still reads as the edge."
+      },
+      {
+        "name": "state-lift",
+        "value": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+        "purpose": "Active rail item and hovered inactive rail items. A response, not a resting property."
+      },
+      {
+        "name": "floating-layer",
+        "value": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+        "purpose": "Dropdowns and modals only, paired with a ring-1 ring-black/5 edge."
+      },
+      {
+        "name": "focus-ring",
+        "value": "0 0 0 2px #ffffff, 0 0 0 4px #6366f1",
+        "purpose": "Keyboard focus on every interactive control. Never removed."
+      },
+      {
+        "name": "document-sheet",
+        "value": "0 1px 3px rgba(0, 0, 0, 0.08)",
+        "purpose": "The A4 sheet in the on-screen print preview, sitting on a Ledger Paper canvas."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-standard",
+        "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Default easing for every state transition."
+      },
+      {
+        "name": "duration-control",
+        "value": "150ms",
+        "purpose": "Buttons, links, nav items. The system default."
+      },
+      {
+        "name": "duration-enter",
+        "value": "200ms",
+        "purpose": "Dropdown and modal entry, paired with a 95% to 100% scale and opacity fade."
+      },
+      {
+        "name": "duration-leave",
+        "value": "75ms",
+        "purpose": "Dropdown and modal exit. Leaving is always faster than arriving."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "container",
+        "value": "1280px"
+      },
+      {
+        "name": "sheet",
+        "value": "210mm"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The neutral page-level action, e.g. Download PDF.",
+      "html": "<button class=\"ds-btn-primary\">Download PDF</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; background: #1f2937; color: #ffffff; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; padding: 8px 16px; border: 1px solid transparent; border-radius: 6px; cursor: pointer; transition: background 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-btn-primary:hover { background: #374151; } .ds-btn-primary:active { background: #111827; } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #6366f1; }"
+    },
+    {
+      "name": "Action Button",
+      "kind": "button",
+      "refersTo": "button-action",
+      "description": "The indigo pen. One per region, on the action that advances the task.",
+      "html": "<button class=\"ds-btn-action\">Add Note</button>",
+      "css": ".ds-btn-action { display: inline-flex; align-items: center; background: #4f46e5; color: #ffffff; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; padding: 8px 16px; border: 1px solid transparent; border-radius: 6px; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); cursor: pointer; transition: background 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-btn-action:hover { background: #4338ca; } .ds-btn-action:focus-visible { outline: none; box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #6366f1; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "White with a Rule Gray border. Everything that is not the one action.",
+      "html": "<button class=\"ds-btn-secondary\">Print View</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; background: #ffffff; color: #374151; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; padding: 8px 16px; border: 1px solid #d1d5db; border-radius: 6px; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); cursor: pointer; transition: background 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-btn-secondary:hover { background: #f9fafb; } .ds-btn-secondary:focus-visible { outline: none; box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #6366f1; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input-text",
+      "description": "One silhouette for text inputs, selects, and textareas, with the label above.",
+      "html": "<div class=\"ds-field\"><label class=\"ds-field-label\" for=\"ds-lut\">LUT Number</label><input class=\"ds-input\" id=\"ds-lut\" type=\"text\" value=\"AD270426032855V\"></div>",
+      "css": ".ds-field { display: block; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; } .ds-field-label { display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 4px; } .ds-input { display: block; width: 100%; background: #ffffff; color: #111827; font-family: inherit; font-size: 0.875rem; line-height: 1.5; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); transition: border-color 150ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-input:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 1px #6366f1; }"
+    },
+    {
+      "name": "Section Rail",
+      "kind": "nav",
+      "refersTo": "rail-item-active",
+      "description": "The signature navigation of the detail workspaces. Fixed 16rem, one active item, optional sub-label.",
+      "html": "<nav class=\"ds-rail\"><button class=\"ds-rail-item ds-rail-item--active\"><span>Invoice</span><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z\"/></svg></button><button class=\"ds-rail-item\"><span class=\"ds-rail-stack\"><span>Private Notes</span><span class=\"ds-rail-sub\">Not visible to the client</span></span><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z\"/></svg></button></nav>",
+      "css": ".ds-rail { display: flex; flex-direction: column; gap: 8px; width: 16rem; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; } .ds-rail-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; text-align: left; padding: 12px 16px; border-radius: 8px; border: 1px solid transparent; background: transparent; color: #4b5563; font-family: inherit; font-size: 0.875rem; font-weight: 700; cursor: pointer; transition: background 150ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1), border-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-rail-item svg { opacity: 0.7; flex-shrink: 0; } .ds-rail-item:hover { background: #ffffff; border-color: #e5e7eb; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); } .ds-rail-item--active, .ds-rail-item--active:hover { background: #4f46e5; color: #ffffff; border-color: transparent; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); } .ds-rail-item:focus-visible { outline: none; box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #6366f1; } .ds-rail-stack { display: flex; flex-direction: column; } .ds-rail-sub { font-size: 0.75rem; font-weight: 500; text-transform: none; color: #9ca3af; } .ds-rail-item--active .ds-rail-sub { color: #e0e7ff; }"
+    },
+    {
+      "name": "Status Pill",
+      "kind": "chip",
+      "refersTo": "status-pill",
+      "description": "State vocabulary. Wash background, ink text, one per state.",
+      "html": "<span class=\"ds-pill ds-pill--paid\">Paid</span> <span class=\"ds-pill ds-pill--sent\">Sent</span> <span class=\"ds-pill ds-pill--overdue\">Overdue</span> <span class=\"ds-pill ds-pill--internal\">Invoice pending</span> <span class=\"ds-pill ds-pill--draft\">Draft</span>",
+      "css": ".ds-pill { display: inline-flex; align-items: center; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 0.75rem; line-height: 1.25rem; font-weight: 600; padding: 2px 8px; border-radius: 9999px; } .ds-pill--paid { background: #dcfce7; color: #166534; } .ds-pill--sent { background: #dbeafe; color: #1e40af; } .ds-pill--overdue { background: #fee2e2; color: #991b1b; } .ds-pill--internal { background: #fef3c7; color: #92400e; } .ds-pill--draft { background: #f3f4f6; color: #1f2937; }"
+    },
+    {
+      "name": "Content Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "The workspace surface: white sheet, optional tinted header strip, hairlines inside.",
+      "html": "<section class=\"ds-panel\"><header class=\"ds-panel-header\"><h3>Private Notes</h3><span class=\"ds-panel-badge\">Internal only</span></header><div class=\"ds-panel-body\"><p class=\"ds-panel-note\">Visible to your team only. These notes are never shown to the client.</p></div></section>",
+      "css": ".ds-panel { background: #ffffff; border-radius: 8px; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); overflow: hidden; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; } .ds-panel-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 24px; background: #f9fafb; border-bottom: 1px solid #f3f4f6; } .ds-panel-header h3 { margin: 0; font-size: 1.125rem; font-weight: 700; color: #111827; } .ds-panel-badge { display: inline-flex; align-items: center; background: #fef3c7; color: #92400e; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 4px 12px; border-radius: 9999px; } .ds-panel-body { padding: 24px; } .ds-panel-note { margin: 0; font-size: 0.875rem; line-height: 1.5; color: #78350f; background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px 16px; }"
+    },
+    {
+      "name": "Ruled Table",
+      "kind": "custom",
+      "refersTo": "panel",
+      "description": "Ruled, not boxed. Tinted header row, hairline row rules, right-aligned semibold numerics.",
+      "html": "<table class=\"ds-table\"><thead><tr><th>Description</th><th class=\"ds-num\">Qty</th><th class=\"ds-num\">Amount</th></tr></thead><tbody><tr><td>Restaurant Management System</td><td class=\"ds-num\">1</td><td class=\"ds-num ds-strong\">INR 1,20,000.00</td></tr><tr><td>Annual support retainer</td><td class=\"ds-num\">1</td><td class=\"ds-num ds-strong\">INR 21,600.00</td></tr></tbody></table>",
+      "css": ".ds-table { width: 100%; border-collapse: collapse; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; } .ds-table thead th { background: #f9fafb; padding: 12px 24px; text-align: left; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; } .ds-table tbody td { padding: 16px 24px; font-size: 0.875rem; color: #111827; border-top: 1px solid #e5e7eb; } .ds-table tbody tr:hover td { background: #f9fafb; } .ds-num { text-align: right; } .ds-strong { font-weight: 600; }"
+    },
+    {
+      "name": "Empty State",
+      "kind": "custom",
+      "refersTo": "empty-state",
+      "description": "The only dashed border in the system. Says what would be here.",
+      "html": "<div class=\"ds-empty\"><p>No private notes on this invoice yet.</p></div>",
+      "css": ".ds-empty { background: #f9fafb; border: 1px dashed #e5e7eb; border-radius: 8px; padding: 40px 24px; text-align: center; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; } .ds-empty p { margin: 0; font-size: 0.875rem; font-style: italic; color: #6b7280; }"
+    },
+    {
+      "name": "Note Entry",
+      "kind": "custom",
+      "refersTo": "panel",
+      "description": "One entry in an internal note thread: indigo-washed left rule, body, byline, quiet delete.",
+      "html": "<article class=\"ds-note\"><div class=\"ds-note-top\"><p class=\"ds-note-body\">Chased payment on 12 Aug. Client confirmed transfer for Friday.</p><button class=\"ds-note-delete\">Delete</button></div><p class=\"ds-note-byline\">Tejas Shah &middot; 12 Aug 2026, 00:58</p></article>",
+      "css": ".ds-note { border-left: 2px solid #c7d2fe; padding: 8px 0 8px 16px; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; } .ds-note-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; } .ds-note-body { margin: 0; font-size: 0.875rem; line-height: 1.625; color: #374151; white-space: pre-line; } .ds-note-delete { background: none; border: none; padding: 0; font-family: inherit; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #9ca3af; cursor: pointer; transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-note-delete:hover { color: #dc2626; } .ds-note-byline { margin: 4px 0 0; font-size: 0.75rem; color: #9ca3af; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Ledger Desk",
+    "overview": "Paper discipline brought to screen. This is a workspace for issuing money documents that a chartered accountant will read months later, so the system behaves like a well-kept ledger: ruled rows, squared panels, quiet grays, and a single indigo pen reserved for the one thing you can act on. The document is the hero. The interface is the desk it sits on, and a desk that draws attention to itself is a badly made desk.\n\nThe register is crisp, confident, and professional rather than merely calm. There is real contrast in the type scale and real conviction in the state colours; nothing is timid. But nothing is expressive either. Confidence here comes from exactness: aligned numerals, consistent intervals, labels that always sit in the same place, and colour that always means something. A screen that looks slightly boring and reads perfectly at a glance has succeeded.\n\nDepth is drawn, not lifted. Hairline borders and tonal fills carry the structure; shadows are a response to state, not a decoration applied to every surface. And the system deliberately keeps two worlds: the screen speaks in Ink Indigo, the printed document speaks in Graphite. A tax invoice should read as a formal record, never as a screenshot of somebody's app.",
+    "keyCharacteristics": [
+      "Grays carry structure; Ink Indigo appears once per region, where you act.",
+      "Every value that needs a name gets a small uppercase label above it.",
+      "Tables are ruled, not boxed: hairline dividers, tinted header row, no cell borders.",
+      "Colour is state. Green settled, red overdue, blue in flight, amber internal.",
+      "Two accents, on purpose: Ink Indigo on screen, Graphite on paper.",
+      "Numbers are right-aligned, tabular, and always carry their currency."
+    ],
+    "rules": [
+      {
+        "name": "The One Pen Rule",
+        "body": "Ink Indigo marks at most one action per region. If two buttons in a panel are indigo, one of them is wrong. Secondary actions are white with a Rule Gray border; neutral-but-primary actions (Download PDF) are Graphite.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Worlds Rule",
+        "body": "Ink Indigo never appears on the printed document, and Graphite never becomes the screen's action colour. The document accent is a single value in config/document-templates.php; changing it changes the paper world only.",
+        "section": "colors"
+      },
+      {
+        "name": "The Colour Means State Rule",
+        "body": "Green, red, blue, and amber are reserved for status. They are never used to decorate, to differentiate sections, or to make a panel feel friendlier. A green heading with no settled meaning is a defect.",
+        "section": "colors"
+      },
+      {
+        "name": "The Label Above Rule",
+        "body": "A named value gets a 12px uppercase Pencil Gray label directly above it, not an inline Label: prefix. The label is the quietest thing in the pair; the value is the loudest.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Display Rule",
+        "body": "Only aggregate money figures get Display size. Scaling up a heading to signal importance is not available; importance is signalled by position and by colour.",
+        "section": "typography"
+      },
+      {
+        "name": "The Fixed Rail Rule",
+        "body": "The section rail is 16rem, always. It does not scale with the viewport, because a nav item that changes width between pages stops being recognisable. Both detail pages hold this; a fluid rail is drift, not a second valid pattern.",
+        "section": "layout"
+      },
+      {
+        "name": "The One Sheet Rule",
+        "body": "The document view is a single surface. The panel is the sheet, so nothing inside it carries a second background, border, shadow, or padding step. A card inside a card is always wrong here.",
+        "section": "layout"
+      },
+      {
+        "name": "The One Panel Rule",
+        "body": "A detail workspace shows exactly one content panel at a time. Do not stack sections vertically and expect the rail to act as an anchor list.",
+        "section": "layout"
+      },
+      {
+        "name": "The Hairline First Rule",
+        "body": "Reach for a border or a tonal fill before reaching for a shadow. If a surface needs a shadow to be distinguishable, its border or its spacing is wrong.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Shadow Is A Verb Rule",
+        "body": "Shadows describe what something is doing (floating, active, hovered), never what something is. A panel does not get a heavier shadow because it is more important.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Dashed Means Empty Rule",
+        "body": "A dashed border means nothing here yet and nothing else. Never use it for emphasis, for drop targets, or for a placeholder that actually contains data.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "Do put a 12px uppercase Pencil Gray label above every named value, and let the value carry the weight.",
+      "Do spend Ink Indigo on exactly one action per region, and use Graphite for a page-level action that is primary but not the task's next step.",
+      "Do separate surfaces with a 1px Hairline Gray border or a Paper Tint fill before considering a shadow.",
+      "Do keep the section rail at a fixed 16rem and show exactly one content panel at a time.",
+      "Do right-align money, keep it semibold, and print the currency code alongside it every time.",
+      "Do give every empty region a real empty state: Paper Tint fill, dashed hairline border, one italic Pencil Gray sentence that says what would be here.",
+      "Do mark anything internal in Internal Amber, and say plainly in words that the client cannot see it.",
+      "Do keep the printed document in Graphite, square-cornered, and laid out with tables and blocks, because Dompdf supports nothing else."
+    ],
+    "donts": [
+      "Don't put Ink Indigo on the printed document or Graphite on a screen action. The two worlds stay separate.",
+      "Don't use green, red, blue, or amber for anything that is not a state. No coloured section headings, no decorative tints.",
+      "Don't add a shadow to make something feel important. Shadows describe floating, hover, and active, nothing else.",
+      "Don't scale a heading up past its role to signal priority. Display size belongs to aggregate figures only.",
+      "Don't introduce a second font family on screen. Figtree does all of it, and DejaVu Sans exists only because the PDF renderer requires it.",
+      "Don't use a dashed border for anything except an empty state.",
+      "Don't reflow a data table into stacked cards at narrow widths. Let it scroll inside its panel.",
+      "Don't put team context, workflow state, or private notes anywhere a client-facing document can reach."
+    ]
+  }
+}
