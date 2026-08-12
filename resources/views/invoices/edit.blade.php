@@ -106,19 +106,12 @@ function customFieldsPicker(available, existing) {
                                 <x-input-error :messages="$errors->get('invoice_type')" class="mt-2" />
                             </div>
 
-                            <!-- Place of Supply -->
-                            <div x-show="invoiceType !== 'export'">
-                                <x-input-label for="place_of_supply" :value="__('Place of Supply (State Code)')" />
-                                <x-text-input id="place_of_supply" class="block mt-1 w-full" type="text" name="place_of_supply" :value="old('place_of_supply', $invoice->place_of_supply)" placeholder="e.g. 27" maxlength="2" />
-                                <x-input-error :messages="$errors->get('place_of_supply')" class="mt-2" />
-                            </div>
-
-                            <!-- LUT Number -->
-                            <div x-show="invoiceType === 'export'">
-                                <x-input-label for="lut_number" :value="__('LUT Number')" />
-                                <x-text-input id="lut_number" class="block mt-1 w-full" type="text" name="lut_number" :value="old('lut_number', $invoice->lut_number)" />
-                                <x-input-error :messages="$errors->get('lut_number')" class="mt-2" />
-                            </div>
+                            @include('documents.partials.supply-fields', [
+                                'document' => $invoice,
+                                'lutOptions' => $lutOptions ?? collect(),
+                                'typeVar' => 'invoiceType',
+                                'kind' => 'invoice',
+                            ])
 
                             <!-- Currency -->
                             <div>
@@ -132,17 +125,7 @@ function customFieldsPicker(available, existing) {
                                 <x-input-error :messages="$errors->get('currency')" class="mt-2" />
                             </div>
 
-                            <!-- Status -->
-                            <div>
-                                <x-input-label for="status" :value="__('Status')" />
-                                <select id="status" name="status" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
-                                    <option value="draft" {{ old('status', $invoice->status) == 'draft' ? 'selected' : '' }}>Draft</option>
-                                    <option value="sent" {{ old('status', $invoice->status) == 'sent' ? 'selected' : '' }}>Sent</option>
-                                    <option value="paid" {{ old('status', $invoice->status) == 'paid' ? 'selected' : '' }}>Paid</option>
-                                    <option value="overdue" {{ old('status', $invoice->status) == 'overdue' ? 'selected' : '' }}>Overdue</option>
-                                </select>
-                                <x-input-error :messages="$errors->get('status')" class="mt-2" />
-                            </div>
+                            {{-- Status is changed from the record page, not here, so a save cannot rewrite it. --}}
                         </div>
 
                         <!-- Invoice Items -->
@@ -309,12 +292,7 @@ function customFieldsPicker(available, existing) {
                         </div>
                         @endif
 
-                        <!-- Notes -->
-                        <div class="mb-6">
-                            <x-input-label for="notes" :value="__('Notes (Optional)')" />
-                            <textarea id="notes" name="notes" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" rows="3">{{ old('notes', $invoice->notes) }}</textarea>
-                            <x-input-error :messages="$errors->get('notes')" class="mt-2" />
-                        </div>
+                        @include('documents.partials.presentation-fields', ['document' => $invoice, 'company' => $company ?? null, 'kind' => 'invoice'])
 
                         <div class="flex items-center justify-end mt-4">
                             <a href="{{ route('invoices.index') }}" class="text-sm text-gray-600 hover:text-gray-900 mr-4">Cancel</a>

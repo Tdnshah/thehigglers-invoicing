@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
+use App\Models\InvoiceRevision;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 use App\Mail\InvoiceCreated;
+use App\Services\DocumentNumberGenerator;
+use App\Services\DocumentRenderer;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Mail;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class InvoiceController extends Controller
 {
@@ -57,7 +60,9 @@ class InvoiceController extends Controller
 
         $clients = $user->clients;
         $companyCustomFields = $this->getCompanyCustomFields($user, 'show_in_invoice');
-        return view('invoices.create', compact('clients', 'companyCustomFields'));
+        $lutOptions = $user->company?->lutOptions() ?? collect();
+        $company = $user->company;
+        return view('invoices.create', compact('clients', 'companyCustomFields', 'lutOptions', 'company'));
     }
 
     /**
@@ -73,13 +78,9 @@ class InvoiceController extends Controller
             abort(403, 'Only administrators can create invoices.');
         }
 
-        $request->merge([
-            'invoice_number' => $request->invoice_number ?? 'INV-' . strtoupper(Str::random(8)), // Fallback auto-generation
-        ]);
-
         $validated = $request->validate([
             'client_id' => 'required|exists:clients,id',
-            'invoice_number' => 'required|string|unique:invoices,invoice_number',
+            'invoice_number' => ['nullable', 'string', 'max:' . DocumentNumberGenerator::MAX_LENGTH, 'regex:' . DocumentNumberGenerator::ALLOWED_PATTERN, 'unique:invoices,invoice_number'],
             'invoice_date' => 'required|date',
             'due_date' => 'nullable|date|after_or_equal:invoice_date',
             'invoice_type' => 'required|string|in:regular,export,interstate',
@@ -95,8 +96,7 @@ class InvoiceController extends Controller
             'custom_fields' => 'nullable|array',
             'custom_fields.*.key' => 'required|string|max:100',
             'custom_fields.*.value' => 'nullable|string|max:255',
-            'notes' => 'nullable|string',
-        ]);
+        ] + $this->documentPresentationRules());
 
         $client = Client::findOrFail($validated['client_id']);
         
@@ -106,7 +106,6 @@ class InvoiceController extends Controller
         }
 
         $subtotal = 0;
-        $totalTax = 0;
         
         // GST Calculation Logic
         $invoiceType = $validated['invoice_type'];
@@ -151,9 +150,19 @@ class InvoiceController extends Controller
 
         $total = $subtotal + $cgst + $sgst + $igst;
 
+        // A blank number means "use the company's numbering format".
+        $invoiceNumber = filled($validated['invoice_number'] ?? null)
+            ? $validated['invoice_number']
+            : app(DocumentNumberGenerator::class)->next(
+                DocumentNumberGenerator::INVOICE,
+                $user->company,
+                $client,
+                \Illuminate\Support\Carbon::parse($validated['invoice_date'])
+            );
+
         $invoice = $user->invoices()->create([
             'client_id' => $client->id,
-            'invoice_number' => $validated['invoice_number'],
+            'invoice_number' => $invoiceNumber,
             'invoice_date' => $validated['invoice_date'],
             'due_date' => $validated['due_date'] ?? null,
             'invoice_type' => $validated['invoice_type'],
@@ -166,7 +175,11 @@ class InvoiceController extends Controller
             'igst' => $igst,
             'total' => $total,
             'status' => 'draft', // Default status
-            'notes' => $validated['notes'] ?? null,
+            'terms_mode' => $validated['terms_mode'] ?? 'global',
+            'terms_conditions' => $validated['terms_conditions'] ?? null,
+            'bank_mode' => $validated['bank_mode'] ?? 'account',
+            'bank_account_id' => $validated['bank_account_id'] ?? null,
+            'bank_details' => $this->normalizeBankRows($validated['bank_details'] ?? []),
         ]);
 
         foreach ($validated['items'] as $item) {
@@ -215,14 +228,33 @@ class InvoiceController extends Controller
             abort(403);
         }
 
-        $invoice->load(['client', 'items']);
-        return view('invoices.show', compact('invoice'));
+        $relations = ['client', 'items', 'quotation', 'payments'];
+
+        // Internal history is never loaded for a client user, so a view level
+        // mistake cannot leak it.
+        if ($user->isCompanyAdmin()) {
+            $relations = array_merge($relations, ['privateNotes.user', 'revisions.user', 'approvedBy']);
+        }
+
+        $invoice->load($relations);
+
+        $allowed = array_values(array_filter([
+            'document',
+            ($user->isCompanyAdmin() || $invoice->payments->count()) ? 'payments' : null,
+            $user->isCompanyAdmin() ? 'notes' : null,
+            $user->isCompanyAdmin() ? 'revisions' : null,
+            'bank',
+        ]));
+
+        $tab = $this->resolveTab(request('tab'), $allowed);
+
+        return view('invoices.show', compact('invoice', 'tab'));
     }
 
     /**
      * Display a print-friendly version of the invoice.
      */
-    public function print(Invoice $invoice)
+    public function print(Invoice $invoice, DocumentRenderer $renderer)
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
@@ -240,14 +272,13 @@ class InvoiceController extends Controller
             abort(403);
         }
 
-        $invoice->load(['client', 'items', 'user.company']);
-        return view('invoices.print', compact('invoice'));
+        return $renderer->view($renderer->forInvoice($invoice));
     }
 
     /**
      * Download the invoice as a PDF.
      */
-    public function downloadPdf(Invoice $invoice)
+    public function downloadPdf(Invoice $invoice, DocumentRenderer $renderer)
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
@@ -265,11 +296,9 @@ class InvoiceController extends Controller
             abort(403);
         }
 
-        $invoice->load(['client', 'items', 'user.company']);
-        
-        $pdf = Pdf::loadView('invoices.print', compact('invoice'));
-        $safeNumber = str_replace(['/', '\\'], '-', $invoice->invoice_number);
-        return $pdf->download('Invoice-' . $safeNumber . '.pdf');
+        $document = $renderer->forInvoice($invoice);
+
+        return $renderer->pdf($document)->download($renderer->filename($document));
     }
 
     /**
@@ -303,7 +332,11 @@ class InvoiceController extends Controller
             ];
         });
 
-        return view('invoices.edit', compact('invoice', 'clients', 'invoiceItems', 'companyCustomFields', 'existingCF'));
+        $lutOptions = $user->company?->lutOptions() ?? collect();
+
+        $company = $user->company;
+
+        return view('invoices.edit', compact('invoice', 'clients', 'invoiceItems', 'companyCustomFields', 'existingCF', 'lutOptions', 'company'));
     }
 
     /**
@@ -324,7 +357,7 @@ class InvoiceController extends Controller
 
         $validated = $request->validate([
             'client_id' => 'required|exists:clients,id',
-            'invoice_number' => 'required|string|unique:invoices,invoice_number,' . $invoice->id,
+            'invoice_number' => ['required', 'string', 'max:' . DocumentNumberGenerator::MAX_LENGTH, 'regex:' . DocumentNumberGenerator::ALLOWED_PATTERN, 'unique:invoices,invoice_number,' . $invoice->id],
             'invoice_date' => 'required|date',
             'due_date' => 'nullable|date|after_or_equal:invoice_date',
             'invoice_type' => 'required|string|in:regular,export,interstate',
@@ -340,9 +373,7 @@ class InvoiceController extends Controller
             'custom_fields' => 'nullable|array',
             'custom_fields.*.key' => 'required|string|max:100',
             'custom_fields.*.value' => 'nullable|string|max:255',
-            'status' => 'required|in:draft,sent,paid,overdue',
-            'notes' => 'nullable|string',
-        ]);
+        ] + $this->documentPresentationRules());
 
         $client = Client::findOrFail($validated['client_id']);
         
@@ -351,7 +382,6 @@ class InvoiceController extends Controller
         }
 
         $subtotal = 0;
-        $totalTax = 0;
         
         // GST Calculation Logic
         $invoiceType = $validated['invoice_type'];
@@ -381,6 +411,11 @@ class InvoiceController extends Controller
         $total = $subtotal + $cgst + $sgst + $igst;
 
         $invoice->update([
+            'terms_mode' => $validated['terms_mode'] ?? 'global',
+            'terms_conditions' => $validated['terms_conditions'] ?? null,
+            'bank_mode' => $validated['bank_mode'] ?? 'account',
+            'bank_account_id' => $validated['bank_account_id'] ?? null,
+            'bank_details' => $this->normalizeBankRows($validated['bank_details'] ?? []),
             'client_id' => $client->id,
             'invoice_number' => $validated['invoice_number'],
             'invoice_date' => $validated['invoice_date'],
@@ -394,8 +429,6 @@ class InvoiceController extends Controller
             'sgst' => $sgst,
             'igst' => $igst,
             'total' => $total,
-            'status' => $validated['status'],
-            'notes' => $validated['notes'] ?? null,
             'custom_fields' => $this->normalizeDocumentCustomFields($validated['custom_fields'] ?? []),
         ]);
 
@@ -413,6 +446,102 @@ class InvoiceController extends Controller
         }
 
         return redirect()->route('invoices.index')->with('success', 'Invoice updated successfully.');
+    }
+
+    /**
+     * Approve an invoice. Approval is the gate that unlocks payments, so it
+     * carries a mandatory note explaining the decision; the note lands in the
+     * internal thread and on the approval revision.
+     */
+    public function approve(Request $request, Invoice $invoice)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        if (! $user->isCompanyAdmin() || $invoice->user_id !== $user->id) {
+            abort(403);
+        }
+
+        if ($invoice->isApproved()) {
+            return redirect()->route('invoices.show', $invoice)->with('error', 'This invoice is already approved.');
+        }
+
+        if ($invoice->isPaid()) {
+            return redirect()->route('invoices.show', $invoice)->with('error', 'This invoice is settled and closed. It cannot be changed.');
+        }
+
+        $validated = $request->validate([
+            'note' => 'required|string|min:3|max:1000',
+        ], [
+            'note.required' => 'An approval note is required. Say why this invoice is being approved.',
+        ]);
+
+        DB::transaction(function () use ($invoice, $user, $validated) {
+            $invoice->update([
+                'status' => 'approved',
+                'approved_at' => now(),
+                'approved_by' => $user->id,
+            ]);
+
+            $invoice->privateNotes()->create([
+                'user_id' => $user->id,
+                'note' => 'Approved: ' . $validated['note'],
+            ]);
+
+            $invoice->load('payments');
+            $invoice->recordRevision(InvoiceRevision::EVENT_APPROVED, $validated['note'], null, $user->id);
+        });
+
+        return redirect()->route('invoices.show', $invoice)->with('success', 'Invoice approved. Payments can now be recorded against it.');
+    }
+
+    /**
+     * Statuses a viewer may set by hand.
+     *
+     * Approval runs through approve() because it needs a note, and paid is
+     * derived from the payments ledger, so neither is offered here. A settled
+     * invoice is closed to all of them.
+     *
+     * @return array<string, string>
+     */
+    public static function selectableStatuses(Invoice $invoice): array
+    {
+        if ($invoice->isPaid()) {
+            return [];
+        }
+
+        return $invoice->isApproved()
+            ? ['approved' => 'Approved', 'sent' => 'Sent', 'overdue' => 'Overdue']
+            : ['draft' => 'Draft', 'sent' => 'Sent', 'overdue' => 'Overdue'];
+    }
+
+    /**
+     * Change the status without opening the edit form.
+     */
+    public function updateStatus(Request $request, Invoice $invoice)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        if (! $user->isCompanyAdmin() || $invoice->user_id !== $user->id) {
+            abort(403);
+        }
+
+        $allowed = array_keys(self::selectableStatuses($invoice));
+
+        if ($allowed === []) {
+            return redirect()->back()->with('error', 'This invoice is settled and closed. Its status cannot be changed.');
+        }
+
+        $validated = $request->validate([
+            'status' => ['required', Rule::in($allowed)],
+        ], [
+            'status.in' => 'That status cannot be set here. Approval needs a note, and paid follows the payments ledger.',
+        ]);
+
+        $invoice->update(['status' => $validated['status']]);
+
+        return redirect()->back()->with('success', 'Invoice marked as ' . $validated['status'] . '.');
     }
 
     /**
