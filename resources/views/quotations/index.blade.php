@@ -61,6 +61,19 @@
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClass }}">
                                                 {{ ucfirst($quotation->status) }}
                                             </span>
+
+                                            {{-- Every approved quotation is expected to end up with an invoice. --}}
+                                            @if($quotation->status === 'approved')
+                                                @if($quotation->isConverted())
+                                                    <a href="{{ route('invoices.show', $quotation->invoice_id) }}" class="mt-1 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800 hover:bg-indigo-200">
+                                                        {{ $quotation->invoice->invoice_number ?? 'Invoice' }}
+                                                    </a>
+                                                @else
+                                                    <span class="mt-1 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-amber-100 text-amber-800">
+                                                        Invoice pending
+                                                    </span>
+                                                @endif
+                                            @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <a href="{{ route('quotations.show', $quotation) }}" class="text-gray-600 hover:text-gray-900 mr-3">View</a>
@@ -71,7 +84,13 @@
 
                                             @if(Auth::user()->isCompanyAdmin() && !$isTreeLocked)
                                             <a href="{{ route('quotations.edit', $quotation) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
-                                            <form action="{{ route('quotations.destroy', $quotation) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this quotation?');">
+                                            @endif
+
+                                            @php
+                                                $treeConverted = $quotation->isConverted() || $quotation->revisions->contains(fn ($r) => $r->isConverted());
+                                            @endphp
+                                            @if(Auth::user()->isCompanyAdmin() && ! $treeConverted)
+                                            <form action="{{ route('quotations.destroy', $quotation) }}" method="POST" class="inline-block" onsubmit="return confirm('Delete this quotation and every revision in the series? This cannot be undone.');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
@@ -103,9 +122,12 @@
                                             <td class="px-6 py-2 whitespace-nowrap text-right text-sm font-medium">
                                                 <a href="{{ route('quotations.show', $revision) }}" class="text-gray-500 hover:text-gray-800 mr-3">View</a>
                                                 
-                                                @if(Auth::user()->isCompanyAdmin() && !$isTreeLocked)
+                                                @if(Auth::user()->isCompanyAdmin() && ! $isTreeLocked)
                                                 <a href="{{ route('quotations.edit', $revision) }}" class="text-indigo-400 hover:text-indigo-700 mr-3">Edit</a>
-                                                <form action="{{ route('quotations.destroy', $revision) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this revision?');">
+                                                @endif
+
+                                                @if(Auth::user()->isCompanyAdmin() && ! $revision->isConverted())
+                                                <form action="{{ route('quotations.destroy', $revision) }}" method="POST" class="inline-block" onsubmit="return confirm('Delete revision V{{ $revision->revision_number }}? This cannot be undone.');">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="text-red-400 hover:text-red-700">Delete</button>

@@ -106,19 +106,12 @@ function customFieldsPicker(available, existing) {
                                 <x-input-error :messages="$errors->get('quotation_type')" class="mt-2" />
                             </div>
 
-                            <!-- Place of Supply -->
-                            <div x-show="quotationType !== 'export'">
-                                <x-input-label for="place_of_supply" :value="__('Place of Supply (State Code)')" />
-                                <x-text-input id="place_of_supply" class="block mt-1 w-full" type="text" name="place_of_supply" :value="old('place_of_supply', $quotation->place_of_supply)" placeholder="e.g. 27" maxlength="2" />
-                                <x-input-error :messages="$errors->get('place_of_supply')" class="mt-2" />
-                            </div>
-
-                            <!-- LUT Number -->
-                            <div x-show="quotationType === 'export'">
-                                <x-input-label for="lut_number" :value="__('LUT Number')" />
-                                <x-text-input id="lut_number" class="block mt-1 w-full" type="text" name="lut_number" :value="old('lut_number', $quotation->lut_number)" />
-                                <x-input-error :messages="$errors->get('lut_number')" class="mt-2" />
-                            </div>
+                            @include('documents.partials.supply-fields', [
+                                'document' => $quotation,
+                                'lutOptions' => $lutOptions ?? collect(),
+                                'typeVar' => 'quotationType',
+                                'kind' => 'quotation',
+                            ])
 
                             <!-- Currency -->
                             <div>
@@ -132,17 +125,7 @@ function customFieldsPicker(available, existing) {
                                 <x-input-error :messages="$errors->get('currency')" class="mt-2" />
                             </div>
 
-                            <!-- Status -->
-                            <div>
-                                <x-input-label for="status" :value="__('Status')" />
-                                <select id="status" name="status" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
-                                    <option value="draft" {{ old('status', $quotation->status) == 'draft' ? 'selected' : '' }}>Draft</option>
-                                    <option value="sent" {{ old('status', $quotation->status) == 'sent' ? 'selected' : '' }}>Sent</option>
-                                    <option value="approved" {{ old('status', $quotation->status) == 'approved' ? 'selected' : '' }}>Approved</option>
-                                    <option value="rejected" {{ old('status', $quotation->status) == 'rejected' ? 'selected' : '' }}>Rejected</option>
-                                </select>
-                                <x-input-error :messages="$errors->get('status')" class="mt-2" />
-                            </div>
+                            {{-- Status is changed from the record page, not here, so a save cannot rewrite it. --}}
                         </div>
 
                         <!-- Quotation Items -->
@@ -316,12 +299,7 @@ function customFieldsPicker(available, existing) {
                             <x-input-error :messages="$errors->get('client_notes')" class="mt-2" />
                         </div>
 
-                        <!-- Terms and Conditions -->
-                        <div class="mb-6">
-                            <x-input-label for="terms_conditions" :value="__('Terms and Conditions')" />
-                            <textarea id="terms_conditions" name="terms_conditions" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" rows="3">{{ old('terms_conditions', $quotation->terms_conditions) }}</textarea>
-                            <x-input-error :messages="$errors->get('terms_conditions')" class="mt-2" />
-                        </div>
+                        @include('documents.partials.presentation-fields', ['document' => $quotation, 'company' => $company ?? null, 'kind' => 'quotation'])
 
                         <div class="flex items-center justify-end mt-4">
                             <a href="{{ route('quotations.index') }}" class="text-sm text-gray-600 hover:text-gray-900 mr-4">Cancel</a>
