@@ -184,11 +184,11 @@ function customFieldsPicker(available, existing) {
                                                 </td>
                                                 <td class="px-4 py-2">
                                                     <select :name="'items[' + index + '][tax_rate]'" x-model="item.tax_rate" class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm">
-                                                        <option :value="0">0%</option>
-                                                        <option :value="5">5%</option>
-                                                        <option :value="12">12%</option>
-                                                        <option :value="18">18%</option>
-                                                        <option :value="28">28%</option>
+                                                        <option value="0">0%</option>
+                                                        <option value="5">5%</option>
+                                                        <option value="12">12%</option>
+                                                        <option value="18">18%</option>
+                                                        <option value="28">28%</option>
                                                     </select>
                                                 </td>
                                                 <td class="px-4 py-2">
