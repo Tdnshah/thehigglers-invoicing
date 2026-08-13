@@ -19,6 +19,7 @@ class Quotation extends Model
         'valid_until',
         'quotation_type',
         'place_of_supply',
+        'lut_number',
         'currency',
         'subtotal',
         'cgst',
@@ -28,6 +29,10 @@ class Quotation extends Model
         'status',
         'client_notes',
         'terms_conditions',
+        'terms_mode',
+        'bank_mode',
+        'bank_details',
+        'bank_account_id',
         'invoice_id',
         'custom_fields',
     ];
@@ -36,6 +41,7 @@ class Quotation extends Model
         'quotation_date' => 'date',
         'valid_until' => 'date',
         'custom_fields' => 'array',
+        'bank_details' => 'array',
     ];
 
     public function user()
@@ -46,6 +52,11 @@ class Quotation extends Model
     public function client()
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function bankAccount()
+    {
+        return $this->belongsTo(BankAccount::class);
     }
 
     public function items()

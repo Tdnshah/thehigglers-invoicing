@@ -2,6 +2,180 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Design tokens.
+ *
+ * Named and shaped after the shadcn contract (HSL triplets consumed through
+ * hsl(var(--token)) in tailwind.config.js) so the surface can move to a React
+ * component library later without re-deciding a single colour. The values are
+ * the Ledger Desk palette recorded in DESIGN.md: a neutral gray structure with
+ * indigo as the one accent, and colour reserved for state.
+ *
+ * Dark values are defined so the system is ready, but nothing toggles .dark
+ * yet; light is the only shipped theme.
+ */
+@layer base {
+    :root {
+        --background: 220 14% 96%;
+        --foreground: 221 39% 11%;
+
+        --card: 0 0% 100%;
+        --card-foreground: 221 39% 11%;
+
+        --popover: 0 0% 100%;
+        --popover-foreground: 221 39% 11%;
+
+        /* Ink Indigo: the single action colour. */
+        --primary: 243 75% 59%;
+        --primary-foreground: 0 0% 100%;
+
+        --secondary: 220 14% 96%;
+        --secondary-foreground: 221 39% 11%;
+
+        --muted: 220 14% 96%;
+        --muted-foreground: 220 9% 46%;
+
+        --accent: 220 14% 96%;
+        --accent-foreground: 221 39% 11%;
+
+        /* State. Never decorative. */
+        --success: 142 71% 45%;
+        --success-foreground: 0 0% 100%;
+        --success-muted: 141 79% 93%;
+        --success-muted-foreground: 143 64% 24%;
+
+        --warning: 32 95% 44%;
+        --warning-foreground: 0 0% 100%;
+        --warning-muted: 48 96% 89%;
+        --warning-muted-foreground: 26 83% 31%;
+
+        --destructive: 0 72% 51%;
+        --destructive-foreground: 0 0% 100%;
+        --destructive-muted: 0 93% 94%;
+        --destructive-muted-foreground: 0 70% 35%;
+
+        --info: 226 71% 40%;
+        --info-foreground: 0 0% 100%;
+        --info-muted: 214 95% 93%;
+        --info-muted-foreground: 226 71% 40%;
+
+        --border: 220 13% 91%;
+        --input: 220 13% 91%;
+        --ring: 239 84% 67%;
+
+        /* The application shell. */
+        --sidebar: 0 0% 100%;
+        --sidebar-foreground: 215 14% 34%;
+        --sidebar-muted: 220 9% 46%;
+        --sidebar-accent: 226 100% 97%;
+        --sidebar-accent-foreground: 243 75% 59%;
+        --sidebar-border: 220 13% 91%;
+
+        --radius: 0.5rem;
+    }
+
+    .dark {
+        --background: 222 47% 9%;
+        --foreground: 210 20% 98%;
+
+        --card: 222 44% 14%;
+        --card-foreground: 210 20% 98%;
+
+        --popover: 222 44% 14%;
+        --popover-foreground: 210 20% 98%;
+
+        --primary: 239 84% 67%;
+        --primary-foreground: 0 0% 100%;
+
+        --secondary: 217 33% 18%;
+        --secondary-foreground: 210 20% 98%;
+
+        --muted: 217 33% 18%;
+        --muted-foreground: 218 11% 65%;
+
+        --accent: 217 33% 18%;
+        --accent-foreground: 210 20% 98%;
+
+        --success: 142 69% 58%;
+        --success-foreground: 144 61% 12%;
+        --success-muted: 143 64% 18%;
+        --success-muted-foreground: 141 79% 85%;
+
+        --warning: 38 92% 50%;
+        --warning-foreground: 26 83% 14%;
+        --warning-muted: 26 83% 20%;
+        --warning-muted-foreground: 48 96% 89%;
+
+        --destructive: 0 72% 51%;
+        --destructive-foreground: 0 0% 100%;
+        --destructive-muted: 0 63% 24%;
+        --destructive-muted-foreground: 0 93% 94%;
+
+        --info: 213 94% 68%;
+        --info-foreground: 226 57% 15%;
+        --info-muted: 226 57% 21%;
+        --info-muted-foreground: 214 95% 93%;
+
+        --border: 217 33% 22%;
+        --input: 217 33% 22%;
+        --ring: 239 84% 67%;
+
+        --sidebar: 222 44% 14%;
+        --sidebar-foreground: 218 11% 75%;
+        --sidebar-muted: 218 11% 65%;
+        --sidebar-accent: 243 40% 22%;
+        --sidebar-accent-foreground: 239 84% 80%;
+        --sidebar-border: 217 33% 22%;
+    }
+
+    * {
+        border-color: hsl(var(--border));
+    }
+
+    body {
+        background-color: hsl(var(--background));
+        color: hsl(var(--foreground));
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* Browser surfaces belong to the design system too. */
+    ::selection {
+        background-color: hsl(var(--primary) / 0.15);
+        color: hsl(var(--foreground));
+    }
+
+    :focus-visible {
+        outline: 2px solid hsl(var(--ring));
+        outline-offset: 2px;
+    }
+
+    /* Money and dates line up column-wise wherever they appear. */
+    table {
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+@layer utilities {
+    .scrollbar-thin {
+        scrollbar-width: thin;
+        scrollbar-color: hsl(var(--border)) transparent;
+    }
+    .scrollbar-thin::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+        background-color: hsl(var(--border));
+        border-radius: 9999px;
+    }
+    .scrollbar-thin::-webkit-scrollbar-track {
+        background: transparent;
+    }
+}
+
+/* Alpine hides these until it initialises. */
+[x-cloak] { display: none !important; }
+
 /* Rich text content rendered from Quill editor */
 .rich-text-content ul {
     list-style-type: disc;

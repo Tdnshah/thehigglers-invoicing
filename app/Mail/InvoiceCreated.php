@@ -11,7 +11,7 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
 use Illuminate\Mail\Mailables\Attachment;
-use Barryvdh\DomPDF\Facade\Pdf;
+use App\Services\DocumentRenderer;
 
 class InvoiceCreated extends Mailable
 {
@@ -57,10 +57,12 @@ class InvoiceCreated extends Mailable
      */
     public function attachments(): array
     {
-        $pdf = Pdf::loadView('invoices.print', ['invoice' => $this->invoice]);
+        $renderer = app(DocumentRenderer::class);
+        $document = $renderer->forInvoice($this->invoice);
+        $pdf = $renderer->pdf($document);
 
         return [
-            Attachment::fromData(fn () => $pdf->output(), 'Invoice-' . $this->invoice->invoice_number . '.pdf')
+            Attachment::fromData(fn () => $pdf->output(), $renderer->filename($document))
                 ->withMime('application/pdf'),
         ];
     }

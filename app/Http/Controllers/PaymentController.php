@@ -3,14 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\Invoice;
-use App\Models\Payment;
+use App\Models\InvoiceRevision;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
     /**
-     * Store a newly created payment in storage.
+     * Record a payment against an invoice.
+     *
+     * Payments are only accepted between approval and full settlement: an
+     * unapproved invoice cannot take money, and a paid one is closed. Part
+     * payments are allowed, and each one writes a revision carrying the total,
+     * the amount received to date, and the balance still due.
      */
     public function store(Request $request, Invoice $invoice)
     {
@@ -27,36 +33,57 @@ class PaymentController extends Controller
             abort(403);
         }
 
+        if (! $invoice->isApproved()) {
+            return redirect()->back()->with('error', 'This invoice has to be approved before a payment can be recorded against it.');
+        }
+
+        if ($invoice->isPaid()) {
+            return redirect()->back()->with('error', 'This invoice is fully paid and closed. It cannot be changed.');
+        }
+
+        $balance = $invoice->balanceDue();
+
         $validated = $request->validate([
-            'amount' => 'required|numeric|min:0.01|max:' . ($invoice->total - $invoice->payments()->sum('amount')),
+            'amount' => 'required|numeric|min:0.01|max:' . $balance,
             'payment_date' => 'required|date',
             'payment_method' => 'nullable|string|max:50',
             'transaction_reference' => 'required|string|max:255',
             'notes' => 'nullable|string',
+        ], [
+            'amount.max' => 'The balance due is only ' . number_format($balance, 2) . '.',
         ]);
 
-        $payment = $invoice->payments()->create([
-            'client_id' => $invoice->client_id,
-            'amount' => $validated['amount'],
-            'payment_date' => $validated['payment_date'],
-            'payment_method' => $validated['payment_method'] ?? null,
-            'transaction_reference' => $validated['transaction_reference'] ?? null,
-            'notes' => $validated['notes'] ?? null,
-        ]);
+        DB::transaction(function () use ($invoice, $validated, $user) {
+            $payment = $invoice->payments()->create([
+                'client_id' => $invoice->client_id,
+                'amount' => $validated['amount'],
+                'payment_date' => $validated['payment_date'],
+                'payment_method' => $validated['payment_method'] ?? null,
+                'transaction_reference' => $validated['transaction_reference'] ?? null,
+                'notes' => $validated['notes'] ?? null,
+            ]);
 
-        // Auto-update invoice status
-        // Refresh the relationship to include the new payment
-        $invoice->load('payments');
-        $totalPaid = $invoice->payments->sum('amount');
-        
-        // Force comparison of floats to be loose or use a small epsilon if strictly needed
-        // but casting to float usually works for monetary values in simple equality checks
-        // if they are exact.
-        // However, invoice total is from DB (string/decimal) and sum is float.
-        if ((float)$totalPaid >= (float)$invoice->total) {
-            $invoice->update(['status' => 'paid']);
-        }
+            // Recount from the ledger rather than trusting the running figure.
+            $invoice->load('payments');
 
-        return redirect()->back()->with('success', 'Payment recorded successfully.');
+            if ($invoice->balanceDue() <= 0.0) {
+                $invoice->update(['status' => 'paid']);
+            }
+
+            $invoice->recordRevision(
+                InvoiceRevision::EVENT_PAYMENT,
+                $validated['notes'] ?? null,
+                $payment,
+                $user->id
+            );
+        });
+
+        $invoice->refresh()->load('payments');
+
+        $message = $invoice->isPaid()
+            ? 'Payment recorded. The invoice is now fully paid and closed.'
+            : 'Part payment recorded. Balance due is ' . number_format($invoice->balanceDue(), 2) . '.';
+
+        return redirect()->back()->with('success', $message);
     }
 }

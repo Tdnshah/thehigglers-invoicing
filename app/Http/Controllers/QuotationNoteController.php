@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Quotation;
+use App\Models\QuotationNote;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,6 +22,16 @@ class QuotationNoteController extends Controller
             'note' => $validated['note']
         ]);
 
-        return redirect()->route('quotations.show', $quotation)->with('success', 'Note added successfully.');
+        return redirect()->route('quotations.show', ['quotation' => $quotation, 'tab' => 'notes'])->with('success', 'Note added.');
+    }
+
+    public function destroy(QuotationNote $note)
+    {
+        if ($note->quotation->user_id !== Auth::id()) abort(403);
+
+        $quotation = $note->quotation;
+        $note->delete();
+
+        return redirect()->route('quotations.show', ['quotation' => $quotation, 'tab' => 'notes'])->with('success', 'Note deleted.');
     }
 }
